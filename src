@@ -1,0 +1,74 @@
+import curses
+from curses import KEY_RIGHT, KEY_LEFT, KEY_UP, KEY_DOWN
+from random import randint
+
+# Initialize the screen
+curses.initscr()
+win = curses.newwin(20, 60, 0, 0)  # Create a new window
+win.keypad(1)  # Enable keypad mode
+curses.noecho()  # Turn off automatic echoing of keys to the screen
+curses.curs_set(0)  # Hide the cursor
+win.border(0)  # Draw a border around the window
+win.nodelay(1)  # Make getch() non-blocking
+
+# Initial snake and food
+snake = [(4, 10), (4, 9), (4, 8)]
+food = (10, 20)
+
+win.addch(food[0], food[1], '*')  # Display the food
+
+# Game logic variables
+key = KEY_RIGHT  # Initial direction
+score = 0
+
+# Main game loop
+while key != 27:  # 27 is the ESC key
+    win.border(0)
+    win.addstr(0, 2, 'Score: ' + str(score) + ' ')
+    win.timeout(150 - (len(snake) // 5 + len(snake) // 10 % 120))  # Increase speed
+
+    prev_key = key
+    event = win.getch()
+    key = key if event == -1 else event
+
+    if key not in [KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN, 27]:
+        key = prev_key
+
+    # Calculate the new coordinates of the head of the snake
+    y = snake[0][0]
+    x = snake[0][1]
+    if key == KEY_DOWN:
+        y += 1
+    if key == KEY_UP:
+        y -= 1
+    if key == KEY_LEFT:
+        x -= 1
+    if key == KEY_RIGHT:
+        x += 1
+
+    # Insert the new head of the snake
+    snake.insert(0, (y, x))
+
+    # Check if snake has eaten the food
+    if snake[0] == food:
+        score += 1
+        food = ()
+        while food == ():
+            food = (randint(1, 18), randint(1, 58))
+            if food in snake:
+                food = ()
+        win.addch(food[0], food[1], '*')
+    else:
+        last = snake.pop()
+        win.addch(last[0], last[1], ' ')
+
+    # Check if snake has hit the border or itself
+    if (snake[0][0] in [0, 19] or
+        snake[0][1] in [0, 59] or
+        snake[0] in snake[1:]):
+        break
+
+    win.addch(snake[0][0], snake[0][1], '#')
+
+curses.endwin()
+print("\nGame Over!\nYour score: " + str(score))
