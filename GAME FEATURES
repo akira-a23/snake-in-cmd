@@ -1,0 +1,5 @@
+Game Mechanics
+Fruits: Represented by a green PI character (*), these increase the snake's length and score when eaten.
+WASD Controls: Use the WASD keys for navigation. Also now with arrow keys
+Score Display: The score is displayed at the top of the screen.
+Open GitHub Profile: Press the b key to open your GitHub profile in the default web browser.
